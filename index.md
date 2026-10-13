@@ -10,48 +10,44 @@ SPIKE アプリのナレッジベースに準拠した公式のモジュール�
 
 ---
 
-
-## 🏎️ motor （単体モーター）
+## 🏎 motor （単体モーター）
 ハブに接続された個々のモーターを制御する公式モジュールです。
-※最新版では、時間や角度を指定して動かす際、必ず頭に `await` をつけます。
 
 ### ◆ モーターを指定位置まで動かす
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import motor
 from hub import port
 
-# Aポートのモーターを360度（1回転）まわす（速度: 1秒間に720度回転する速さ）
-await motor.run_for_degrees(port.A, 360, 720)
-
-# Aポートのモーターを2000ミリ秒（2秒間）まわす
-await motor.run_for_time(port.A, 2000, 720)
-```
+async def main():
+    # Aポートを速度720で360度まわす
+    await motor.run_for_degrees(port.A, 360, 720)
+    # 2秒間まわす
+    await motor.run_for_time(port.A, 2000, 720)
+</pre>
 
 ### ◆ ずっと回転させる・止める
-```python
-# モーターを指定した速度（720度/秒）でずっと回転させる（await不要）
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+# 指定した速度でずっと回転
 motor.run(port.A, 720)
-
-# モーターを止める
-# stopの種類: motor.COAST（惰性で止める）, motor.BRAKE（ブレーキ）, motor.HOLD（位置をキープ）
+# ブレーキをかけて止める
 motor.stop(port.A, stop=motor.BRAKE)
-```
-
----
+</pre>
 
 ## 👥 motor_pair （モーターペア）
-2つのモーターを同期させて、ロボットを移動・旋回させる公式モジュールです。
+2つのモーターを同期させて、ロボットを移動させるモジュールです。
 
 ### ◆ ペアの設定と基本移動
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import motor_pair
 from hub import port
 
-# PAIR_1 として、左モーターをA、右モーターをBに割り当てる
+# 左モーターをA、右モーターをBに設定
 motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
-
-# まっすぐ（steering=0）360度分だけ進む（速度720）
+# まっすぐ360度分進む
 await motor_pair.move_for_degrees(motor_pair.PAIR_1, 360, steering=0, velocity=720)
+</pre>
+
+
 
 # まっすぐ2000ミリ秒（2秒間）進む
 await motor_pair.move_for_time(motor_pair.PAIR_1, 2000, steering=0, velocity=720)
