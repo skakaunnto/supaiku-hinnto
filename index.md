@@ -1,8 +1,3 @@
----
-layout: default
-theme: jekyll-theme-cayman
----
-
 # 📚 LEGO Education SPIKE (App 3) 公式 Python API 辞書
 
 SPIKE アプリのナレッジベースに準拠した公式のモジュールと関数のリファレンスです。
