@@ -1,0 +1,34 @@
+{
+  "name": "spike-hint-dictionary",
+  "displayName": "SPIKE Prime Python3 ヒント辞書",
+  "description": "オフラインでも横から出せるSPIKE公式準拠のPython辞書",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "spike-hint-sidebar",
+          "title": "SPIKEヒント",
+          "icon": "$(book)"
+        }
+      ]
+    },
+    "views": {
+      "spike-hint-sidebar": [
+        {
+          "type": "webview",
+          "id": "spikeHintWebview",
+          "name": "公式リファレンス"
+        }
+      ]
+    }
+  }
+}
