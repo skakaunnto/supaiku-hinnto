@@ -163,7 +163,7 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 <div class="card-container">
 
     <!-- カラーセンサー -->
-    <a href="#" class="card-link">
+    <a href="color.html" class="card-link">
         <div class="main-card color-sensor">
             <h3>🎨 カラーセンサー (color_sensor)</h3>
             <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
