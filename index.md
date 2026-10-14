@@ -1,4 +1,10 @@
 <style>
+/* 全体のフォントなどの基本調整 */
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+}
+
 /* カードを並べるコンテナ */
 .card-container {
     display: grid;
@@ -8,19 +14,44 @@
     margin: 30px auto;
 }
 
-/* カード共通スタイル */
-.main-card {
+/* カード・通常のコード枠（共通スタイル） */
+.main-card, .code-block {
     background-color: #ffffff;
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
     color: #333333;
     border: 1px solid #e0e0e0;
+    text-align: left;
 }
 
-.main-card:hover {
+/* カード内の黒いプログラム枠、および独立した黒いプログラム枠 */
+.main-card pre, .code-block {
+    background: #2d2d2d !important;
+    color: #f8f8f2 !important;
+    padding: 15px !important;
+    border-radius: 6px !important;
+    font-family: monospace !important;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 0 0 15px 0;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* カードをクリックできるボタンにするための設定 */
+.card-link {
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+/* ホバー時の演出 */
+.card-link:hover .main-card {
     transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    background-color: #fafafa;
 }
 
 /* 各項目のテーマカラー（左側の線） */
@@ -28,16 +59,23 @@
 .distance-sensor { border-left: 6px solid #3498db; }
 .force-sensor { border-left: 6px solid #2ecc71; }
 .gyro-sensor { border-left: 6px solid #f1c40f; }
-.async-basic { border-left: 6px solid #9b59b6; } /* 紫 */
-.async-parallel { border-left: 6px solid #1abc9c; } /* ターコイズ */
-.async-loop { border-left: 6px solid #e67e22; } /* オレンジ */
+.async-basic { border-left: 6px solid #9b59b6; } 
+.async-parallel { border-left: 6px solid #1abc9c; } 
+.async-loop { border-left: 6px solid #e67e22; } 
 
 .main-card h3 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     font-size: 1.3rem;
     color: #2c3e50;
-    font-family: sans-serif;
+}
+
+/* 詳細ページへの案内テキスト */
+.click-hint {
+    font-size: 0.8rem;
+    color: #3498db;
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 .main-card p {
@@ -45,20 +83,6 @@
     font-size: 0.95rem;
     line-height: 1.5;
     color: #555;
-    font-family: sans-serif;
-}
-
-/* カード内のミニコード枠 */
-.main-card pre {
-    background: #2d2d2d;
-    color: #f8f8f2;
-    padding: 12px;
-    border-radius: 6px;
-    font-family: monospace;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    overflow-x: auto;
-    margin: 0 0 15px 0;
 }
 
 .main-card pre:last-child {
@@ -87,7 +111,7 @@ SPIKE アプリのナレッジベースに準拠した公式のモジュール�
 ハブに接続された個々のモーターを制御する公式モジュールです。
 
 ### ◆ モーターを指定位置まで動かす
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 import motor
 from hub import port
 
@@ -99,7 +123,7 @@ async def main():
 </pre>
 
 ### ◆ ずっと回転させる・止める
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 # 指定した速度でずっと回転
 motor.run(port.A, 720)
 # ブレーキをかけて止める
@@ -110,7 +134,7 @@ motor.stop(port.A, stop=motor.BRAKE)
 2つのモーターを同期させて、ロボットを移動させるモジュールです。
 
 ### ◆ ペアの設定と基本移動
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 import motor_pair
 from hub import port
 
@@ -124,7 +148,7 @@ await motor_pair.move_for_time(motor_pair.PAIR_1, 2000, steering=0, velocity=720
 </pre>
 
 ### ◆ 旋回（曲がる）と停止
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 # その場で右にスピン旋回する（steering=100 で右スピン、-100 で左スピン）
 await motor_pair.move_for_degrees(motor_pair.PAIR_1, 180, steering=100, velocity=360)
 
@@ -139,11 +163,13 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 <div class="card-container">
 
     <!-- カラーセンサー -->
-    <div class="main-card color-sensor">
-        <h3>🎨 カラーセンサー (color_sensor)</h3>
-        <p>周囲の色や反射光の強さを測定します。ライントレースや特定の色での停止に使用します。</p>
-        
-        <h4>① 色の常時監視（非同期）</h4>
+    <a href="#" class="card-link">
+        <div class="main-card color-sensor">
+            <h3>🎨 カラーセンサー (color_sensor)</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>周囲の色や反射光の強さを測定します。ライントレースや特定の色での停止に使用します。</p>
+            
+            <h4>① 色の常時監視（非同期）</h4>
 <pre>
 import color_sensor
 import runloop
@@ -159,7 +185,7 @@ async def main():
 runloop.run(main())
 </pre>
 
-        <h4>② 実践：ライントレース（2値制御）</h4>
+            <h4>② 実践：ライントレース（2値制御）</h4>
 <pre>
 import motor_pair
 import color_sensor
@@ -168,25 +194,28 @@ import runloop
 
 async def main():
     motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
-    for _ in range(500): # 5秒間走る
+    for _ in range(500):
         brightness = color_sensor.reflection(port.C)
-        if brightness < 40: # 黒なら右へ
+        if brightness < 40:
             motor_pair.move(motor_pair.PAIR_1, steering=30, velocity=300)
-        else: # 白なら左へ
+        else:
             motor_pair.move(motor_pair.PAIR_1, steering=-30, velocity=300)
         await runloop.sleep_ms(10)
     motor_pair.stop(motor_pair.PAIR_1)
 
 runloop.run(main())
 </pre>
-    </div>
+        </div>
+    </a>
 
     <!-- 超音波距離センサー -->
-    <div class="main-card distance-sensor">
-        <h3>🦇 距離センサー (distance_sensor)</h3>
-        <p>障害物までの距離（mm）を測定します。壁の検知や迷路攻略に必須です。</p>
-        
-        <h4>① 障害物の接近を監視</h4>
+    <a href="#" class="card-link">
+        <div class="main-card distance-sensor">
+            <h3>🦇 距離センサー (distance_sensor)</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>障害物までの距離（mm）を測定します。壁の検知や迷路攻略に必須です。</p>
+            
+            <h4>① 障害物の接近を監視</h4>
 <pre>
 import distance_sensor
 import runloop
@@ -203,21 +232,22 @@ async def main():
 runloop.run(main())
 </pre>
 
-        <h4>② トラブル解決：安全なループ待機</h4>
+            <h4>② トラブル解決：安全なループ待機</h4>
 <pre>
-# 単純な while True: だとハブがフリーズします
-# 必ず runloop.sleep_ms を挟んでボタン入力を受付可能にします
 while distance_sensor.distance(port.D) > 150:
-    await runloop.sleep_ms(10) # これが不可欠！
+    await runloop.sleep_ms(10)
 </pre>
-    </div>
+        </div>
+    </a>
 
     <!-- フォースセンサー -->
-    <div class="main-card force-sensor">
-        <h3>🖲️ フォースセンサー (force_sensor)</h3>
-        <p>ボタンの押し込みや圧力を測定します。バンパースイッチなどの検知に使用します。</p>
-        
-        <h4>① スイッチが押されるのを待つ</h4>
+    <a href="#" class="card-link">
+        <div class="main-card force-sensor">
+            <h3>🖲️ フォースセンサー (force_sensor)</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>ボタンの押し込みや圧力を測定します。バンパースイッチなどの検知に使用します。</p>
+            
+            <h4>① スイッチが押されるのを待つ</h4>
 <pre>
 import force_sensor
 import runloop
@@ -231,28 +261,31 @@ async def main():
 
 runloop.run(main())
 </pre>
-    </div>
+        </div>
+    </a>
 
     <!-- 内蔵ジャイロセンサー -->
-    <div class="main-card gyro-sensor">
-        <h3>🧭 内蔵ジャイロセンサー (imu)</h3>
-        <p>ハブの傾きや向き（角度）を測定します。ブレのない正確な旋回を実現します。</p>
-        
-        <h4>① 指定角度の監視（戻り値は10倍）</h4>
+    <a href="#" class="card-link">
+        <div class="main-card gyro-sensor">
+            <h3>🧭 内蔵ジャイロセンサー (imu)</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>ハブの傾きや向き（角度）を測定します。ブレのない正確な旋回を実現します。</p>
+            
+            <h4>① 指定角度の監視（戻り値は10倍）</h4>
 <pre>
 import imu
 import runloop
 
 async def main():
     imu.reset_yaw(0)
-    while imu.rotation() < 900: # 90度の意味
+    while imu.rotation() < 900:
         await runloop.sleep_ms(5)
     print("目標角度に到達！")
 
 runloop.run(main())
 </pre>
 
-        <h4>② 実践：ピタッと90度曲がる決定版コード</h4>
+            <h4>② 実践：ピタッと90度曲がる決定版コード</h4>
 <pre>
 import motor_pair
 import imu
@@ -262,17 +295,18 @@ import runloop
 async def main():
     motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
     imu.reset_yaw(0)
-    await runloop.sleep_ms(100) # 安定待ち
+    await runloop.sleep_ms(100)
     motor_pair.move(motor_pair.PAIR_1, steering=100, velocity=200)
     
-    while imu.rotation() < 900: # 900に達するまで監視
+    while imu.rotation() < 900:
         await runloop.sleep_ms(5)
         
     motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
 runloop.run(main())
 </pre>
-    </div>
+        </div>
+    </a>
 
 </div>
 
@@ -283,27 +317,30 @@ runloop.run(main())
 <div class="card-container">
 
     <!-- 非同期の基本 -->
-    <div class="main-card async-basic">
-        <h3>基本：async と await</h3>
-        <p>SPIKEの時間待ち関数などは非同期で作られているため、呼び出す時は必ず頭に「await」をつけます。</p>
+    <a href="#" class="card-link">
+        <div class="main-card async-basic">
+            <h3>基本：async と await</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>SPIKEの時間待ち関数などは非同期で作られているため、呼び出す時は必ず頭に「await」をつけます。</p>
 <pre>
 import runloop
 
 async def main():
     print("スタート")
-    # awaitで1秒間「非同期」で待つ
-    # この待機中も他の処理が動けます
     await runloop.sleep_ms(1000)
     print("1秒経ちました")
 
 runloop.run(main())
 </pre>
-    </div>
+        </div>
+    </a>
 
     <!-- 同時並行処理 -->
-    <div class="main-card async-parallel">
-        <h3>応用：2つのタスクを同時に動かす</h3>
-        <p>「音を鳴らす」と「画面を光らせる」など、別の処理を完全に同時に並行して実行させる技法です。</p>
+    <a href="#" class="card-link">
+        <div class="main-card async-parallel">
+            <h3>応用：2つのタスクを同時に動かす</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>「音を鳴らす」と「画面を光らせる」など、別の処理を完全に同時に並行して実行させる技法です。</p>
 <pre>
 import runloop
 import sound
@@ -320,7 +357,6 @@ async def task_light():
         await runloop.sleep_ms(500)
 
 async def main():
-    # 2つの独立した関数を同時に起動する
     runloop.create_task(task_sound())
     runloop.create_task(task_light())
     
@@ -329,25 +365,27 @@ async def main():
 
 runloop.run(main())
 </pre>
-    </div>
+        </div>
+    </a>
 
     <!-- 無限ループのフリーズ防止 -->
-    <div class="main-card async-loop">
-        <h3>重要：無限ループのフリーズ防止</h3>
-        <p>whileループの中に待機処理を入れないとハブのシステム全体がフリーズします。必ず休憩を挟みます。</p>
+    <a href="#" class="card-link">
+        <div class="main-card async-loop">
+            <h3>重要：無限ループのフリーズ防止</h3>
+            <div class="click-hint">👉 クリックで詳細ページを開く（準備中）</div>
+            <p>whileループの中に待機処理を入れないとハブのシステム全体がフリーズします。必ず休憩を挟みます。</p>
 <pre>
 import runloop
 
 async def main():
     while True:
         print("ループ中")
-        # わずか1ミリ秒でも休憩を入れることで
-        # ハブのフリーズを完全に防げます
         await runloop.sleep_ms(1)
 
 runloop.run(main())
 </pre>
-    </div>
+        </div>
+    </a>
 
 </div>
 
@@ -356,7 +394,7 @@ runloop.run(main())
 ## ⚙️ runloop （実行ループ）
 SPIKEのプログラムを正しく制御し、並行処理や待機を行うための必須モジュールです。
 
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 import runloop
 
 async def main():
@@ -377,7 +415,7 @@ runloop.run(main())
 ### 1. ハブのライトマトリクス（5x5画面）に文字や絵を出す
 デバッグや、センサーの値をハブの画面で確認したいときに役立ちます。
 
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 import hub
 import runloop
 
@@ -385,16 +423,8 @@ async def main():
     # ハブの画面に「GO」という文字をスクロール表示する
     await hub.light_matrix.write("GO")
     
-    # 特定の形（笑顔など）をパッと表示する
-    # 0が消灯、9が一番明るい（光の強さを0〜9で指定）
-    smiley = [
-        0,9,0,9,0,
-        0,9,0,9,0,
-        0,0,0,0,0,
-        9,0,0,0,9,
-        0,9,9,9,0
-    ]
-    hub.light_matrix.show(smiley)
+    # 画面にビルトインの笑顔マークを出します
+    hub.light_matrix.show(hub.light_matrix.IMAGE_HAPPY)
 
 runloop.run(main())
 </pre>
@@ -402,7 +432,7 @@ runloop.run(main())
 ### 2. ハブの「BEEP音（スピーカー）」を鳴らす
 プログラムが特定の場所まで到達したか、センサーが反応したかを「音」で知らせるデバッグテクニックです。
 
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
+<pre class="code-block">
 import sound
 import runloop
 
