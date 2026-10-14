@@ -2,9 +2,9 @@
 /* センサーカードを並べるコンテナ */
 .sensor-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    max-width: 1400px;
     margin: 30px auto;
 }
 
@@ -12,10 +12,10 @@
 .sensor-card {
     background-color: #ffffff;
     border-radius: 12px;
-    padding: 20px;
+    padding: 25px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
-    color: #333333; /* 文字を読みやすく黒に固定 */
+    color: #333333;
     border: 1px solid #e0e0e0;
 }
 
@@ -32,17 +32,30 @@
 .sensor-card h3 {
     margin-top: 0;
     margin-bottom: 10px;
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     color: #2c3e50;
     font-family: sans-serif;
 }
 
 .sensor-card p {
-    margin: 0;
+    margin: 0 0 15px 0;
     font-size: 0.95rem;
     line-height: 1.5;
     color: #555;
     font-family: sans-serif;
+}
+
+/* カード内のミニコード枠 */
+.sensor-card pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin: 0;
 }
 </style>
 
@@ -107,32 +120,94 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
 ---
 
-## 🔌 センサー（各モジュール一覧）
+## 🔌 センサー（無限ループ・非同期処理対応）
 
 <div class="sensor-container">
 
     <!-- カラーセンサー -->
     <div class="sensor-card color-sensor">
         <h3>🎨 カラーセンサー (color_sensor)</h3>
-        <p>周囲の色（8色）や、床面から反射する光の強さ（0〜100）を測定します。ライントレースや、特定の色のブロックを検知してロボットを止めるプログラムに必須のセンサーです。</p>
+        <p>周囲の色や反射光の強さを測定します。非同期ループで常に色を監視するコードです。</p>
+<pre>
+import color_sensor
+import runloop
+from hub import port
+
+async def main():
+    # 無限ループで色を監視（非同期処理）
+    while True:
+        color = color_sensor.color(port.C)
+        if color == color_sensor.RED:
+            print("赤を検知！")
+        # フリーズ防止の非同期待機
+        await runloop.sleep_ms(10)
+
+runloop.run(main())
+</pre>
     </div>
 
     <!-- 超音波距離センサー -->
     <div class="sensor-card distance-sensor">
         <h3>🦇 距離センサー (distance_sensor)</h3>
-        <p>超音波を使って、前方にある障害物までの距離をミリメートル（mm）単位で正確に測定します。壁の手前で速度を落としたり、迷路を解いたりするロボットに最適です。</p>
+        <p>障害物までの距離（mm）を測定します。一定距離に近づくまでループで待機する非同期処理です。</p>
+<pre>
+import distance_sensor
+import runloop
+from hub import port
+
+async def main():
+    print("壁を探しています...")
+    # 壁に近づくまで非同期でループ
+    while True:
+        dist = distance_sensor.distance(port.D)
+        if dist is not None and dist < 100:
+            print("壁まで残り10cm以内！")
+            break # ループを抜ける
+        await runloop.sleep_ms(10)
+
+runloop.run(main())
+</pre>
     </div>
 
     <!-- フォースセンサー -->
     <div class="sensor-card force-sensor">
         <h3>🖲️ フォースセンサー (force_sensor)</h3>
-        <p>ボタンが「押されたか・離されたか」の検知に加え、加えられている圧力の強さをニュートン（0〜10N）単位で測定します。バンパースイッチや、物を掴む力の制御に使います。</p>
+        <p>ボタンの押し込みや圧力を測定します。押されるまで非同期で「待ち続ける」ループ処理です。</p>
+<pre>
+import force_sensor
+import runloop
+from hub import port
+
+async def main():
+    print("スイッチを押してください")
+    # 押されるまで無限ループで待機
+    while not force_sensor.pressed(port.E):
+        await runloop.sleep_ms(10)
+        
+    print("スイッチが押されました！")
+
+runloop.run(main())
+</pre>
     </div>
 
     <!-- 内蔵ジャイロセンサー -->
     <div class="sensor-card gyro-sensor">
         <h3>🧭 内蔵ジャイロセンサー (imu)</h3>
-        <p>SPIKEハブに最初から内蔵されている6軸センサーです。ロボットの傾きや、旋回した正確な角度（ヨー角）をリアルタイムに検出して、ブレのない正確な移動を実現します。</p>
+        <p>ハブの傾きや向き（角度）を測定します。指定の角度に到達するまで非同期で監視します。</p>
+<pre>
+import imu
+import runloop
+
+async def main():
+    imu.reset_yaw(0)
+    # 90度（数値は10倍の900）になるまでループ
+    while imu.rotation() < 900:
+        # 非同期でハブの動きをチェック
+        await runloop.sleep_ms(5)
+    print("90度回転しました！")
+
+runloop.run(main())
+</pre>
     </div>
 
 </div>
