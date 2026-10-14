@@ -151,3 +151,12 @@ async def main():
 
 runloop.run(main())
 ```
+<style>
+  pre, code {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    padding: 12px;
+    border-radius: 6px;
+    display: block;
+  }
+</style>
