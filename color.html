@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>🎨 カラーセンサー詳細解説 - SPIKE Python 辞書</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #333333;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-top: 8px solid #e74c3c; /* カラーセンサーのテーマ赤 */
+        }
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            font-size: 1.4rem;
+        }
+        h3 {
+            color: #34495e;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+        p {
+            color: #555555;
+            font-size: 0.95rem;
+            margin: 0 0 15px 0;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 0 0 20px 0;
+        }
+        .back-btn {
+            display: inline-block;
+            background-color: #7f8c8d;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-top: 20px;
+        }
+        .back-btn:hover {
+            background-color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
 
+<div class="container">
+
+    <h1>🎨 カラーセンサー (color_sensor)</h1>
+    <p>SPIKEのカラーセンサーは、周囲にある物体の「色」を識別したり、床面から反射して返ってくる「光の強さ（反射光）」を測定するための非常に強力なモジュールです。</p>
+
+    <h2>1. 基本的な色の検知</h2>
+    <p>センサーの前に置かれた色（赤、青、緑、黄など）を判定します。特定の色のブロックを検知してロボットを停止させるプログラムなどに使用します。</p>
+<pre>
+import color_sensor
+from hub import port
+
+# Cポートに接続されたセンサーが検知している色を取得
+# 戻り値: color_sensor.RED, color_sensor.BLUE, color_sensor.GREEN, None（色なし）など
+detected_color = color_sensor.color(port.C)
+
+if detected_color == color_sensor.RED:
+    print("赤色を検知しました！")
+</pre>
+
+    <h2>2. 非同期ループでの常時監視</h2>
+    <p><code>while True:</code> を使ってロボットが走っている間、常に色が変わったかどうかをチェックし続ける非同期プログラムです。ハブがフリーズしないよう、必ず <code>runloop.sleep_ms</code> を挟みます。</p>
+<pre>
+import color_sensor
+import runloop
+from hub import port
+
+async def main():
+    print("色の監視を開始します...")
+    while True:
+        color = color_sensor.color(port.C)
+        if color == color_sensor.RED:
+            print("赤を検知！")
+        
+        # 10ミリ秒休憩（ハブのフリーズ防止）
+        await runloop.sleep_ms(10)
+
+runloop.run(main())
+</pre>
+
+    <h2>3. 応用テクニック：ライントレース（2値制御）</h2>
+    <p>地面に書かれた黒い線の「境界線」をなぞるように走るプログラムです。反射光の強さ（0〜100）を取得し、数値が小さければ黒、大きければ白と判定して左右のモーターを微調整しながら進みます。</p>
+<pre>
+import motor_pair
+import color_sensor
+from hub import port
+import runloop
+
+async def main():
+    # AとBのモーターをペアリング
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    
+    # 5秒間（10ミリ秒 × 500回ループ）走る例
+    for _ in range(500): 
+        brightness = color_sensor.reflection(port.C)
+        
+        if brightness < 40: # 黒の上なら
+            # 右に曲がって白の側へ出る
+            motor_pair.move(motor_pair.PAIR_1, steering=30, velocity=300)
+        else: # 白の上なら
+            # 左に曲がって黒の側へ入る
+            motor_pair.move(motor_pair.PAIR_1, steering=-30, velocity=300)
+            
+        await runloop.sleep_ms(10) # 10ミリ秒ごとにセンサーをチェック
+        
+    # 時間が来たらモーターを完全に停止
+    motor_pair.stop(motor_pair.PAIR_1)
+
+runloop.run(main())
+</pre>
+
+    <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 30px 0;">
+
+    <a href="index.html" class="back-btn">⬅ メニューに戻る</a>
+
+</div>
+
+</body>
+</html>
