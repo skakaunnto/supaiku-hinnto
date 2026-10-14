@@ -1,83 +1,20 @@
 <style>
-/* 全体のフォントなどの基本調整 */
-body {
-    font-family: sans-serif;
-    line-height: 1.6;
-    background-color: #f8f9fa;
-    padding: 20px;
-}
-
-/* 独立したコード枠（モーター用） */
-.code-block {
-    background: #2d2d2d;
-    color: #f8f8f2;
-    padding: 15px;
-    border-radius: 6px;
-    font-family: monospace;
-    line-height: 1.6;
-    overflow-x: auto;
-    margin-bottom: 20px;
-}
-
-/* カードを並べるコンテナ */
-.card-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 30px auto;
-}
-
-/* メニューカードの共通スタイル */
-.main-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 30px 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    color: #333333;
-    border: 1px solid #e2e8f0;
-    text-align: center;
-}
-
-/* カードをクリックできるボタンにするための設定 */
-.card-link {
-    text-decoration: none;
-    display: block;
-    cursor: pointer;
-}
-
-/* ホバー時に浮き上がる演出 */
-.card-link:hover .main-card {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* 各項目のテーマカラー（左側のアクセント線） */
+body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; padding: 20px; }
+.card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 30px auto; }
+.main-card { background-color: #ffffff; border-radius: 12px; padding: 30px 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; color: #333333; border: 1px solid #e2e8f0; text-align: center; }
+.card-link { text-decoration: none; display: block; cursor: pointer; }
+.card-link:hover .main-card { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
 .color-sensor { border-left: 6px solid #e74c3c; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 .distance-sensor { border-left: 6px solid #3498db; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 .force-sensor { border-left: 6px solid #2ecc71; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 .gyro-sensor { border-left: 6px solid #f1c40f; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
-.async-basic { border-left: 6px solid #9b59b6; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; } 
-.async-parallel { border-left: 6px solid #1abc9c; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; } 
-.async-loop { border-left: 6px solid #e67e22; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; } 
+.async-basic { border-left: 6px solid #9b59b6; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+.async-parallel { border-left: 6px solid #1abc9c; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+.async-loop { border-left: 6px solid #e67e22; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 .light-matrix { border-left: 6px solid #e84393; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 .beep-sound { border-left: 6px solid #00cec9; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
-
-/* カードのタイトル（見出し） */
-.main-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.2rem;
-    color: #2c3e50;
-}
-
-/* クリックを促すテキスト */
-.click-hint {
-    font-size: 0.85rem;
-    color: #3498db;
-    font-weight: bold;
-    margin: 0;
-}
+.main-card h3 { margin: 0 0 10px 0; font-size: 1.2rem; color: #2c3e50; }
+.click-hint { font-size: 0.85rem; color: #3498db; font-weight: bold; margin: 0; }
 </style>
 
 # 📚 LEGO Education SPIKE (App 3) 公式 Python API 辞書
@@ -124,6 +61,7 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 ## 🔌 センサー・機能別詳細メニュー（クリックで各解説ページへ）
 
 <div class="card-container">
+
     <!-- ① カラーセンサー -->
     <a href="color.html" class="card-link">
         <div id="color" class="main-card color-sensor">
@@ -195,11 +133,13 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
             <p class="click-hint">詳しく見る ➔</p>
         </div>
     </a>
+
 </div>
 
 ---
 
 ## ⚙️ runloop （実行ループ）
+
 SPIKEのプログラムを正しく制御し、並行処理や待機を行うための必須モジュールです。
 
 ```python
