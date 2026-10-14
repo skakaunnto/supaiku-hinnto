@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>💡 ライトマトリクス詳細解説 - SPIKE Python 辞書</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #333333; padding: 30px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 8px solid #e84393; }
+        h1 { color: #2c3e50; margin-top: 0; font-size: 1.8rem; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; font-size: 1.4rem; }
+        p { color: #555555; font-size: 0.95rem; margin: 0 0 15px 0; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0 0 20px 0; }
+        .back-btn { display: inline-block; background-color: #7f8c8d; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; margin-top: 20px; }
+        .back-btn:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💡 ライトマトリクス (5x5画面)</h1>
+    <p>SPIKEハブの表面にある5x5マトリクスLEDの表示をコントロールするモジュールです。現在のロボットの状態を表示させたり、デバッグメッセージをスクロール表示するのに役立ちます。</p>
+
+    <h2>1. 文字列のスクロール表示</h2>
+    <p>ハブの画面にアルファベットのテキストを1文字ずつ左へ流れるように表示させます。プログラムのスタート合図（GOなど）によく使われます。</p>
+<pre>
+import hub
+import runloop
+
+async def main():
+    # ハブの画面に「GO」という文字をスクロール表示する（表示完了を待つ）
+    await hub.light_matrix.write("GO")
+
+runloop.run(main())
+</pre>
+
+    <h2>2. 公式組み込みイメージの表示</h2>
+    <p>配列の定義を使わずに、SPIKEシステム内にあらかじめ登録されている「笑顔（IMAGE_HAPPY）」や「ハート」などのアイコンをパッと表示させることができます。</p>
+<pre>
+import hub
+
+# 画面にビルトインの笑顔マーク（HAPPY）を表示する
+hub.light_matrix.show(hub.light_matrix.IMAGE_HAPPY)
+</pre>
+
+    <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 30px 0;">
+    <a href="index.html" class="back-btn">⬅ メニューに戻る</a>
+</div>
+</body>
+</html>
