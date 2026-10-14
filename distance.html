@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>🦇 距離センサー詳細解説 - SPIKE Python 辞書</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #333333; padding: 30px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 8px solid #3498db; }
+        h1 { color: #2c3e50; margin-top: 0; font-size: 1.8rem; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; font-size: 1.4rem; }
+        p { color: #555555; font-size: 0.95rem; margin: 0 0 15px 0; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0 0 20px 0; }
+        .back-btn { display: inline-block; background-color: #7f8c8d; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; margin-top: 20px; }
+        .back-btn:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🦇 距離センサー (distance_sensor)</h1>
+    <p>超音波を使って、前方にある障害物までの距離をミリメートル（mm）単位で正確に測定するためのモジュールです。壁の検知や迷路を解くロボットの制御に必須のセンサーです。</p>
+
+    <h2>1. 障害物の接近を監視（基本）</h2>
+    <p>センサーが障害物との距離を取得します。1〜2000mm（2メートル）まで測定可能ですが、近すぎる場合や測定不能な場合は <code>None</code> が返ってくるため、必ず <code>None</code> チェックを行います。</p>
+<pre>
+import distance_sensor
+from hub import port
+
+# Dポートに接続されたセンサーから距離（mm）を取得
+mm_distance = distance_sensor.distance(port.D)
+
+if mm_distance is not None and mm_distance < 150:
+    print("前方15cm以内に障害物があります！")
+</pre>
+
+    <h2>2. トラブル解決：安全なループ待機（応用）</h2>
+    <p>「障害物が15cm以内に近づくまでずっと待つ」というプログラムを組む際、単純な <code>while</code> ループ内に待機を挟まないとハブのシステム全体がフリーズしてしまいます。フリーズを防ぎ、安全にプログラムの中断・ボタン入力を受け付けるための必須テクニックです。</p>
+<pre>
+import distance_sensor
+import runloop
+from hub import port
+
+async def main():
+    print("壁を探しています...")
+    
+    # 距離が150mmより大きい間、ループを回し続ける
+    while True:
+        dist = distance_sensor.distance(port.D)
+        
+        # 150mm未満、かつ測定エラー（None）ではない場合にループを抜ける
+        if dist is not None and dist < 150:
+            break
+            
+        # 10ミリ秒の「非同期待期」を挟むことでフリーズを完全に防ぐ
+        await runloop.sleep_ms(10)
+        
+    print("壁に接近したため、次のアクションに移ります！")
+
+runloop.run(main())
+</pre>
+
+    <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 30px 0;">
+    <a href="index.html" class="back-btn">⬅ メニューに戻る</a>
+</div>
+</body>
+</html>
