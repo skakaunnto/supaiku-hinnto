@@ -1,5 +1,51 @@
----
----
+<style>
+/* センサーカードを並べるコンテナ */
+.sensor-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+/* センサー枠（共通スタイル） */
+.sensor-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    color: #333333; /* 文字を読みやすく黒に固定 */
+    border: 1px solid #e0e0e0;
+}
+
+.sensor-card:hover {
+    transform: translateY(-5px);
+}
+
+/* センサーごとのテーマカラー */
+.color-sensor { border-left: 6px solid #e74c3c; }
+.distance-sensor { border-left: 6px solid #3498db; }
+.force-sensor { border-left: 6px solid #2ecc71; }
+.gyro-sensor { border-left: 6px solid #f1c40f; }
+
+.sensor-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.25rem;
+    color: #2c3e50;
+    font-family: sans-serif;
+}
+
+.sensor-card p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #555;
+    font-family: sans-serif;
+}
+</style>
+
 # 📚 LEGO Education SPIKE (App 3) 公式 Python API 辞書
 
 SPIKE アプリのナレッジベースに準拠した公式のモジュールと関数のリファレンスです。
@@ -45,105 +91,58 @@ from hub import port
 motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
 # まっすぐ360度分進む
 await motor_pair.move_for_degrees(motor_pair.PAIR_1, 360, steering=0, velocity=720)
-</pre>
-
-
 
 # まっすぐ2000ミリ秒（2秒間）進む
 await motor_pair.move_for_time(motor_pair.PAIR_1, 2000, steering=0, velocity=720)
-```
+</pre>
 
 ### ◆ 旋回（曲がる）と停止
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 # その場で右にスピン旋回する（steering=100 で右スピン、-100 で左スピン）
 await motor_pair.move_for_degrees(motor_pair.PAIR_1, 180, steering=100, velocity=360)
 
 # ペアモーターを完全に停止させる
 motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
-```
+</pre>
 
 ---
 
-## 🎨 color_sensor （カラーセンサー）
-周囲の色や、地面から反射する光の強さを測定する公式モジュールです。
+## 🔌 センサー（各モジュール一覧）
 
-### ◆ 色の検知
-```python
-import color_sensor
-from hub import port
+<div class="sensor-container">
 
-# センサーが検知している色を取得する
-# 戻り値: color_sensor.RED, color_sensor.BLUE, color_sensor.GREEN, None（色なし）など
-detected_color = color_sensor.color(port.C)
+    <!-- カラーセンサー -->
+    <div class="sensor-card color-sensor">
+        <h3>🎨 カラーセンサー (color_sensor)</h3>
+        <p>周囲の色（8色）や、床面から反射する光の強さ（0〜100）を測定します。ライントレースや、特定の色のブロックを検知してロボットを止めるプログラムに必須のセンサーです。</p>
+    </div>
 
-if detected_color == color_sensor.RED:
-    print("赤色を検知しました")
-```
+    <!-- 超音波距離センサー -->
+    <div class="sensor-card distance-sensor">
+        <h3>🦇 距離センサー (distance_sensor)</h3>
+        <p>超音波を使って、前方にある障害物までの距離をミリメートル（mm）単位で正確に測定します。壁の手前で速度を落としたり、迷路を解いたりするロボットに最適です。</p>
+    </div>
 
-### ◆ 反射光の検知（ライントレース用）
-```python
-# 反射光の強さを取得する（戻り値: 0 〜 100 の整数値）
-# 黒い線の上では数値が小さくなり、白い床の上では数値が大きくなります
-brightness = color_sensor.reflection(port.C)
-```
+    <!-- フォースセンサー -->
+    <div class="sensor-card force-sensor">
+        <h3>🖲️ フォースセンサー (force_sensor)</h3>
+        <p>ボタンが「押されたか・離されたか」の検知に加え、加えられている圧力の強さをニュートン（0〜10N）単位で測定します。バンパースイッチや、物を掴む力の制御に使います。</p>
+    </div>
 
----
+    <!-- 内蔵ジャイロセンサー -->
+    <div class="sensor-card gyro-sensor">
+        <h3>🧭 内蔵ジャイロセンサー (imu)</h3>
+        <p>SPIKEハブに最初から内蔵されている6軸センサーです。ロボットの傾きや、旋回した正確な角度（ヨー角）をリアルタイムに検出して、ブレのない正確な移動を実現します。</p>
+    </div>
 
-## 🦇 distance_sensor （距離センサー）
-超音波を使って、前方の障害物までの距離を測定する公式モジュールです。
-
-```python
-import distance_sensor
-from hub import port
-
-# 障害物までの距離をミリメートル（mm）で取得する
-# 戻り値: 整数（ミリメートル）。測定不能または近すぎる場合は None 
-mm_distance = distance_sensor.distance(port.D)
-
-if mm_distance is not None and mm_distance < 150:
-    print("前方15cm以内に障害物があります")
-```
-
----
-
-## 🖲️ force_sensor （フォースセンサー）
-ボタンの押し込み状態や、加えられている力（圧力）を測定する公式モジュールです。
-
-```python
-import force_sensor
-from hub import port
-
-# 1. いまボタンが押されているかどうかを調べる（戻り値: True または False）
-if force_sensor.pressed(port.E):
-    print("ボタンが押されています")
-
-# 2. ボタンが押されている強さを測定する（戻り値: 0 〜 10 ニュートン）
-force_n = force_sensor.force(port.E)
-```
-
----
-
-## 🧭 imu （内蔵ジャイロセンサー）
-ハブに内蔵された6軸ジャイロを使って、ロボットの向きや傾きを測定する公式モジュールです。
-
-```python
-import imu
-
-# ハブの現在の向き（ヨー角：旋回した角度）を取得する
-# 💡注意: 戻り値は「度数の10倍」の整数で返ってきます（例: 90度のときは 900）
-raw_angles = imu.rotation()
-yaw_angle = raw_angles / 10  # 10で割ることで、正しい「〇度」に変換できます
-
-# 現在の向きを「0度」として基準をリセットする
-imu.reset_yaw(0)
-```
+</div>
 
 ---
 
 ## ⚙️ runloop （実行ループ）
 SPIKEのプログラムを正しく制御し、並行処理や待機を行うための必須モジュールです。
 
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import runloop
 
 async def main():
@@ -155,7 +154,8 @@ async def main():
 
 # メイン関数を実行ループに登録して起動する
 runloop.run(main())
-```
+</pre>
+
 ---
 
 ## 🛠️ 【実践】よくあるトラブル解決と高度なテクニック
@@ -165,7 +165,7 @@ runloop.run(main())
 ### 1. 「プログラムが途中で止まらない！」を解決する（無限ループの抜け方）
 センサーの値を待つ際、単純な `while True:` を使うとハブがフリーズしたようになり、ボタン操作を受け付けなくなることがあります。安全にループを回すには、必ず `runloop.sleep_ms()` を挟みます。
 
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import color_sensor
 from hub import port
 import runloop
@@ -179,12 +179,12 @@ async def main():
     print("黒い線をみつけました！")
 
 runloop.run(main())
-```
+</pre>
 
 ### 2. 「ジャイロセンサーでピタッと90度曲がる」コード
 ロボットのバッテリー残量や床の滑りやすさに影響されず、正確に90度旋回するための決定版コードです。
 
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import motor_pair
 import imu
 from hub import port
@@ -210,12 +210,12 @@ async def main():
     print("90度旋回が完了しました")
 
 runloop.run(main())
-```
+</pre>
 
 ### 3. 「ライントレース（線に沿って走る）」の基本構造
 カラーセンサーの反射光（0〜100）を使って、黒い線の「境界線」をなぞるように走る基本（2値制御）のコードです。
 
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import motor_pair
 import color_sensor
 from hub import port
@@ -240,12 +240,12 @@ async def main():
     motor_pair.stop(motor_pair.PAIR_1)
 
 runloop.run(main())
-```
+</pre>
 
 ### 4. ハブのライトマトリクス（5x5画面）に文字や絵を出す
 デバッグ（今どのプログラムが動いているか）や、センサーの値をハブの画面で確認したいときに役立ちます。
 
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import hub
 import runloop
 
@@ -265,12 +265,12 @@ async def main():
     hub.light_matrix.show(smiley)
 
 runloop.run(main())
-```
+</pre>
 
 ### 5. ハブの「BEEP音（スピーカー）」を鳴らす
 プログラムが特定の場所まで到達したか、センサーが反応したかを「音」で知らせるデバッグテクニックです。
 
-```python
+<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import sound
 import runloop
 
@@ -282,3 +282,4 @@ async def main():
     sound.volume(50)
 
 runloop.run(main())
+</pre>
