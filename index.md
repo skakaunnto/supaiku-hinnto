@@ -1,6 +1,6 @@
 <style>
-/* センサーカードを並べるコンテナ */
-.sensor-container {
+/* カードを並べるコンテナ */
+.card-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 25px;
@@ -8,8 +8,8 @@
     margin: 30px auto;
 }
 
-/* センサー枠（共通スタイル） */
-.sensor-card {
+/* カード共通スタイル */
+.main-card {
     background-color: #ffffff;
     border-radius: 12px;
     padding: 25px;
@@ -19,17 +19,20 @@
     border: 1px solid #e0e0e0;
 }
 
-.sensor-card:hover {
+.main-card:hover {
     transform: translateY(-5px);
 }
 
-/* センサーごとのテーマカラー */
+/* 各項目のテーマカラー（左側の線） */
 .color-sensor { border-left: 6px solid #e74c3c; }
 .distance-sensor { border-left: 6px solid #3498db; }
 .force-sensor { border-left: 6px solid #2ecc71; }
 .gyro-sensor { border-left: 6px solid #f1c40f; }
+.async-basic { border-left: 6px solid #9b59b6; } /* 紫 */
+.async-parallel { border-left: 6px solid #1abc9c; } /* ターコイズ */
+.async-loop { border-left: 6px solid #e67e22; } /* オレンジ */
 
-.sensor-card h3 {
+.main-card h3 {
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.3rem;
@@ -37,7 +40,7 @@
     font-family: sans-serif;
 }
 
-.sensor-card p {
+.main-card p {
     margin: 0 0 15px 0;
     font-size: 0.95rem;
     line-height: 1.5;
@@ -46,7 +49,7 @@
 }
 
 /* カード内のミニコード枠 */
-.sensor-card pre {
+.main-card pre {
     background: #2d2d2d;
     color: #f8f8f2;
     padding: 12px;
@@ -55,7 +58,18 @@
     font-size: 0.85rem;
     line-height: 1.5;
     overflow-x: auto;
-    margin: 0;
+    margin: 0 0 15px 0;
+}
+
+.main-card pre:last-child {
+    margin-bottom: 0;
+}
+
+/* 小見出しスタイル */
+.main-card h4 {
+    margin: 15px 0 5px 0;
+    font-size: 1rem;
+    color: #34495e;
 }
 </style>
 
@@ -120,91 +134,216 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
 ---
 
-## 🔌 センサー（無限ループ・非同期処理対応）
+## 🔌 センサーモジュール一覧（基本・応用・トラブル解決）
 
-<div class="sensor-container">
+<div class="card-container">
 
     <!-- カラーセンサー -->
-    <div class="sensor-card color-sensor">
+    <div class="main-card color-sensor">
         <h3>🎨 カラーセンサー (color_sensor)</h3>
-        <p>周囲の色や反射光の強さを測定します。非同期ループで常に色を監視するコードです。</p>
+        <p>周囲の色や反射光の強さを測定します。ライントレースや特定の色での停止に使用します。</p>
+        
+        <h4>① 色の常時監視（非同期）</h4>
 <pre>
 import color_sensor
 import runloop
 from hub import port
 
 async def main():
-    # 無限ループで色を監視（非同期処理）
     while True:
         color = color_sensor.color(port.C)
         if color == color_sensor.RED:
             print("赤を検知！")
-        # フリーズ防止の非同期待機
         await runloop.sleep_ms(10)
+
+runloop.run(main())
+</pre>
+
+        <h4>② 実践：ライントレース（2値制御）</h4>
+<pre>
+import motor_pair
+import color_sensor
+from hub import port
+import runloop
+
+async def main():
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    for _ in range(500): # 5秒間走る
+        brightness = color_sensor.reflection(port.C)
+        if brightness < 40: # 黒なら右へ
+            motor_pair.move(motor_pair.PAIR_1, steering=30, velocity=300)
+        else: # 白なら左へ
+            motor_pair.move(motor_pair.PAIR_1, steering=-30, velocity=300)
+        await runloop.sleep_ms(10)
+    motor_pair.stop(motor_pair.PAIR_1)
 
 runloop.run(main())
 </pre>
     </div>
 
     <!-- 超音波距離センサー -->
-    <div class="sensor-card distance-sensor">
+    <div class="main-card distance-sensor">
         <h3>🦇 距離センサー (distance_sensor)</h3>
-        <p>障害物までの距離（mm）を測定します。一定距離に近づくまでループで待機する非同期処理です。</p>
+        <p>障害物までの距離（mm）を測定します。壁の検知や迷路攻略に必須です。</p>
+        
+        <h4>① 障害物の接近を監視</h4>
 <pre>
 import distance_sensor
 import runloop
 from hub import port
 
 async def main():
-    print("壁を探しています...")
-    # 壁に近づくまで非同期でループ
     while True:
         dist = distance_sensor.distance(port.D)
         if dist is not None and dist < 100:
             print("壁まで残り10cm以内！")
-            break # ループを抜ける
+            break
         await runloop.sleep_ms(10)
 
 runloop.run(main())
 </pre>
+
+        <h4>② トラブル解決：安全なループ待機</h4>
+<pre>
+# 単純な while True: だとハブがフリーズします
+# 必ず runloop.sleep_ms を挟んでボタン入力を受付可能にします
+while distance_sensor.distance(port.D) > 150:
+    await runloop.sleep_ms(10) # これが不可欠！
+</pre>
     </div>
 
     <!-- フォースセンサー -->
-    <div class="sensor-card force-sensor">
+    <div class="main-card force-sensor">
         <h3>🖲️ フォースセンサー (force_sensor)</h3>
-        <p>ボタンの押し込みや圧力を測定します。押されるまで非同期で「待ち続ける」ループ処理です。</p>
+        <p>ボタンの押し込みや圧力を測定します。バンパースイッチなどの検知に使用します。</p>
+        
+        <h4>① スイッチが押されるのを待つ</h4>
 <pre>
 import force_sensor
 import runloop
 from hub import port
 
 async def main():
-    print("スイッチを押してください")
-    # 押されるまで無限ループで待機
+    print("スイッチ待ち...")
     while not force_sensor.pressed(port.E):
         await runloop.sleep_ms(10)
-        
-    print("スイッチが押されました！")
+    print("押されました！")
 
 runloop.run(main())
 </pre>
     </div>
 
     <!-- 内蔵ジャイロセンサー -->
-    <div class="sensor-card gyro-sensor">
+    <div class="main-card gyro-sensor">
         <h3>🧭 内蔵ジャイロセンサー (imu)</h3>
-        <p>ハブの傾きや向き（角度）を測定します。指定の角度に到達するまで非同期で監視します。</p>
+        <p>ハブの傾きや向き（角度）を測定します。ブレのない正確な旋回を実現します。</p>
+        
+        <h4>① 指定角度の監視（戻り値は10倍）</h4>
 <pre>
 import imu
 import runloop
 
 async def main():
     imu.reset_yaw(0)
-    # 90度（数値は10倍の900）になるまでループ
-    while imu.rotation() < 900:
-        # 非同期でハブの動きをチェック
+    while imu.rotation() < 900: # 90度の意味
         await runloop.sleep_ms(5)
-    print("90度回転しました！")
+    print("目標角度に到達！")
+
+runloop.run(main())
+</pre>
+
+        <h4>② 実践：ピタッと90度曲がる決定版コード</h4>
+<pre>
+import motor_pair
+import imu
+from hub import port
+import runloop
+
+async def main():
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    imu.reset_yaw(0)
+    await runloop.sleep_ms(100) # 安定待ち
+    motor_pair.move(motor_pair.PAIR_1, steering=100, velocity=200)
+    
+    while imu.rotation() < 900: # 900に達するまで監視
+        await runloop.sleep_ms(5)
+        
+    motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
+
+runloop.run(main())
+</pre>
+    </div>
+
+</div>
+
+---
+
+## ⚡ 非同期処理・並行タスク一覧
+
+<div class="card-container">
+
+    <!-- 非同期の基本 -->
+    <div class="main-card async-basic">
+        <h3>基本：async と await</h3>
+        <p>SPIKEの時間待ち関数などは非同期で作られているため、呼び出す時は必ず頭に「await」をつけます。</p>
+<pre>
+import runloop
+
+async def main():
+    print("スタート")
+    # awaitで1秒間「非同期」で待つ
+    # この待機中も他の処理が動けます
+    await runloop.sleep_ms(1000)
+    print("1秒経ちました")
+
+runloop.run(main())
+</pre>
+    </div>
+
+    <!-- 同時並行処理 -->
+    <div class="main-card async-parallel">
+        <h3>応用：2つのタスクを同時に動かす</h3>
+        <p>「音を鳴らす」と「画面を光らせる」など、別の処理を完全に同時に並行して実行させる技法です。</p>
+<pre>
+import runloop
+import sound
+import hub
+
+async def task_sound():
+    while True:
+        await sound.play_beep(60, 200)
+        await runloop.sleep_ms(1000)
+
+async def task_light():
+    while True:
+        await hub.light_matrix.write("!")
+        await runloop.sleep_ms(500)
+
+async def main():
+    # 2つの独立した関数を同時に起動する
+    runloop.create_task(task_sound())
+    runloop.create_task(task_light())
+    
+    while True:
+        await runloop.sleep_ms(10)
+
+runloop.run(main())
+</pre>
+    </div>
+
+    <!-- 無限ループのフリーズ防止 -->
+    <div class="main-card async-loop">
+        <h3>重要：無限ループのフリーズ防止</h3>
+        <p>whileループの中に待機処理を入れないとハブのシステム全体がフリーズします。必ず休憩を挟みます。</p>
+<pre>
+import runloop
+
+async def main():
+    while True:
+        print("ループ中")
+        # わずか1ミリ秒でも休憩を入れることで
+        # ハブのフリーズを完全に防げます
+        await runloop.sleep_ms(1)
 
 runloop.run(main())
 </pre>
@@ -233,92 +372,10 @@ runloop.run(main())
 
 ---
 
-## 🛠️ 【実践】よくあるトラブル解決と高度なテクニック
+## 💡 その他の応用テクニック
 
-公式辞書には載っていない、プログラムを思い通りに動かすための重要なノウハウです。
-
-### 1. 「プログラムが途中で止まらない！」を解決する（無限ループの抜け方）
-センサーの値を待つ際、単純な `while True:` を使うとハブがフリーズしたようになり、ボタン操作を受け付けなくなることがあります。安全にループを回すには、必ず `runloop.sleep_ms()` を挟みます。
-
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
-import color_sensor
-from hub import port
-import runloop
-
-async def main():
-    print("黒い線をさがしています...")
-    # 反射光が30未満（黒）になるまで、プログラムを10ミリ秒ずつ休憩しながら待つ
-    while color_sensor.reflection(port.C) > 30:
-        await runloop.sleep_ms(10)
-        
-    print("黒い線をみつけました！")
-
-runloop.run(main())
-</pre>
-
-### 2. 「ジャイロセンサーでピタッと90度曲がる」コード
-ロボットのバッテリー残量や床の滑りやすさに影響されず、正確に90度旋回するための決定版コードです。
-
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
-import motor_pair
-import imu
-from hub import port
-import runloop
-
-async def main():
-    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
-    
-    # 1. いまの向きを 0度 にリセット
-    imu.reset_yaw(0)
-    await runloop.sleep_ms(100) # リセットが安定するまで少し待つ
-    
-    # 2. 右にスピン旋回を開始（ずっと回すモード）
-    motor_pair.move(motor_pair.PAIR_1, steering=100, velocity=200)
-    
-    # 3. ジャイロの角度が「90度（900）」になるまで監視する
-    # ※imu.rotation()は10倍の数値が返るため、90度は 900 と書きます
-    while imu.rotation() < 900:
-        await runloop.sleep_ms(5)
-        
-    # 4. 90度になったらガチッと止める
-    motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
-    print("90度旋回が完了しました")
-
-runloop.run(main())
-</pre>
-
-### 3. 「ライントレース（線に沿って走る）」の基本構造
-カラーセンサーの反射光（0〜100）を使って、黒い線の「境界線」をなぞるように走る基本（2値制御）のコードです。
-
-<pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
-import motor_pair
-import color_sensor
-from hub import port
-import runloop
-
-async def main():
-    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
-    
-    # 5秒間（5000ミリ秒）だけライントレースを実行する例
-    for _ in range(500): 
-        brightness = color_sensor.reflection(port.C)
-        
-        if brightness < 40: # 黒の上なら
-            # 右に曲がって白の側へ出る
-            motor_pair.move(motor_pair.PAIR_1, steering=30, velocity=300)
-        else: # 白の上なら
-            # 左に曲がって黒の側へ入る
-            motor_pair.move(motor_pair.PAIR_1, steering=-30, velocity=300)
-            
-        await runloop.sleep_ms(10) # 10ミリ秒ごとにセンサーをチェック
-        
-    motor_pair.stop(motor_pair.PAIR_1)
-
-runloop.run(main())
-</pre>
-
-### 4. ハブのライトマトリクス（5x5画面）に文字や絵を出す
-デバッグ（今どのプログラムが動いているか）や、センサーの値をハブの画面で確認したいときに役立ちます。
+### 1. ハブのライトマトリクス（5x5画面）に文字や絵を出す
+デバッグや、センサーの値をハブの画面で確認したいときに役立ちます。
 
 <pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
 import hub
@@ -342,7 +399,7 @@ async def main():
 runloop.run(main())
 </pre>
 
-### 5. ハブの「BEEP音（スピーカー）」を鳴らす
+### 2. ハブの「BEEP音（スピーカー）」を鳴らす
 プログラムが特定の場所まで到達したか、センサーが反応したかを「音」で知らせるデバッグテクニックです。
 
 <pre style="background:#2d2d2d; color:#f8f8f2; padding:15px; border-radius:6px; font-family:monospace; line-height:1.6;">
