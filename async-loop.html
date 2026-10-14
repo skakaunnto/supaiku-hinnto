@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>🟠 無限ループとフリーズ防止詳細解説 - SPIKE Python 辞書</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #333333; padding: 30px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 8px solid #e67e22; }
+        h1 { color: #2c3e50; margin-top: 0; font-size: 1.8rem; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; font-size: 1.4rem; }
+        p { color: #555555; font-size: 0.95rem; margin: 0 0 15px 0; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0 0 20px 0; }
+        .back-btn { display: inline-block; background-color: #7f8c8d; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; margin-top: 20px; }
+        .back-btn:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🟠 無限ループとフリーズ防止</h1>
+    <p>SPIKEのPythonプログラムにおいて、最も遭遇しやすい「ハブのフリーズトラブル」の原因と、それを解決するための絶対ルールを解説します。</p>
+
+    <h2>1. フリーズの原因と正しい対策</h2>
+    <p>非同期環境における <code>while True:</code>（無限ループ）の中に、<code>await</code> を使った待機処理が1つも含まれていない場合、プログラムがハブの処理能力を100%占有してしまい、ハブが完全にフリーズ（ボタン操作すら受け付けない状態）します。フリーズを防ぐには、必ずループ内にわずかでも休憩を挟んでください。</p>
+<pre>
+import runloop
+
+async def main():
+    print("ループ処理を開始します（フリーズ対策済）")
+    
+    while True:
+        # ここに常時実行したい処理を書きます
+        # 例: センサー値の読み込みなど
+        
+        # 【重要】わずか1ミリ秒でも await で休憩を入れることで、
+        # ハブのシステムに制御権が戻り、フリーズを完全に防止できます。
+        await runloop.sleep_ms(1)
+
+runloop.run(main())
+</pre>
+
+    <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 30px 0;">
+    <a href="index.html" class="back-btn">⬅ メニューに戻る</a>
+</div>
+</body>
+</html>
