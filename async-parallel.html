@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>🟢 同時並行処理詳細解説 - SPIKE Python 辞書</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #333333; padding: 30px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 8px solid #1abc9c; }
+        h1 { color: #2c3e50; margin-top: 0; font-size: 1.8rem; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; font-size: 1.4rem; }
+        p { color: #555555; font-size: 0.95rem; margin: 0 0 15px 0; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0 0 20px 0; }
+        .back-btn { display: inline-block; background-color: #7f8c8d; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; margin-top: 20px; }
+        .back-btn:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🟢 同時並行処理 (create_task)</h1>
+    <p>「ロボットを走らせながら、スピーカーから音を鳴らし、同時に画面のライトを点滅させる」といった、複数の仕事を完全に同時に実行させるための高度なテクニックです。</p>
+
+    <h2>1. 複数のタスクを同時に起動する</h2>
+    <p><code>runloop.create_task()</code> を使用すると、バックグラウンドで別の関数を同時に走らせることができます。メインの処理を止めずに、別のアクションを並行させたいときに非常に役立ちます。</p>
+<pre>
+import runloop
+import sound
+import hub
+
+# バックグラウンドタスク1: 1秒ごとにBEEP音を鳴らし続ける
+async def task_sound():
+    while True:
+        await sound.play_beep(60, 200)
+        await runloop.sleep_ms(1000)
+
+# バックグラウンドタスク2: 0.5秒ごとに画面に「!」を出し続ける
+async def task_light():
+    while True:
+        await hub.light_matrix.write("!")
+        await runloop.sleep_ms(500)
+
+async def main():
+    # 2つの独立した関数を、並行タスクとして同時に登録・起動
+    runloop.create_task(task_sound())
+    runloop.create_task(task_light())
+    
+    # メインループ：これ自体も動かし続ける必要があります
+    print("同時並行タスクが起動しました")
+    while True:
+        await runloop.sleep_ms(10)
+
+runloop.run(main())
+</pre>
+
+    <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 30px 0;">
+    <a href="index.html" class="back-btn">⬅ メニューに戻る</a>
+</div>
+</body>
+</html>
