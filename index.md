@@ -15,6 +15,19 @@ body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; pad
 .beep-sound { border-left: 6px solid #00cec9; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 .main-card h3 { margin: 0 0 10px 0; font-size: 1.2rem; color: #2c3e50; }
 .click-hint { font-size: 0.85rem; color: #3498db; font-weight: bold; margin: 0; }
+
+/* 🌟 ここでコードブロックを完璧な黒色に上書きします（全角スペース無し） */
+pre, code, .highlight, .highlight pre, div.highlighter-rouge .highlight {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+  font-family: 'Courier New', Courier, monospace !important;
+}
+div.highlighter-rouge, pre {
+  border: 1px solid #333333 !important;
+  border-radius: 6px !important;
+  padding: 15px !important;
+  overflow-x: auto !important;
+}
 </style>
 
 # 📚 LEGO Education SPIKE (App 3) 公式 Python API 辞書
@@ -151,12 +164,3 @@ async def main():
 
 runloop.run(main())
 ```
-<style>
-  pre, code {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-    padding: 12px;
-    border-radius: 6px;
-    display: block;
-  }
-</style>
