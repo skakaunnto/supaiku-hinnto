@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>🧭 内蔵ジャイロセンサー詳細解説 - SPIKE Python 辞書</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #333333; padding: 30px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 8px solid #f1c40f; }
+        h1 { color: #2c3e50; margin-top: 0; font-size: 1.8rem; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; font-size: 1.4rem; }
+        p { color: #555555; font-size: 0.95rem; margin: 0 0 15px 0; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0 0 20px 0; }
+        .back-btn { display: inline-block; background-color: #7f8c8d; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; margin-top: 20px; }
+        .back-btn:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🧭 内蔵ジャイロセンサー (imu)</h1>
+    <p>SPIKEプライムのハブ内部に組み込まれている6軸慣性計測装置（IMU）です。ロボットが向いている水平な角度（ヨー角）や、前後左右の傾きをリアルタイムに検知して、ブレのない超高精度な走行を実現します。</p>
+
+    <h2>1. 旋回角度の取得（基本の注意点）</h2>
+    <p>ハブが回転した角度（方位）を取得します。SPIKE App 3の仕様として、<b>ジャイロセンサーの戻り値は「実際の度数の10倍」の整数</b>で返ってきます（例：90度回転したときの値は <code>900</code> になります）。プログラム内で扱う際は注意してください。</p>
+<pre>
+import imu
+
+# 現在のハブの回転角度を取得する
+raw_angle = imu.rotation()
+
+# 10で割ることで、見慣れた「〇度」の数値に変換できます
+yaw_angle = raw_angle / 10
+print("現在の向き: " + str(yaw_angle) + "度")
+</pre>
+
+    <h2>2. 実践応用：ジャイロセンサーでピタッと90度曲がる決定版</h2>
+    <p>ロボットのモーター駆動だけだと、タイヤのスリップやバッテリー残量で回転がズレてしまいます。ジャイロの値をリアルタイムで監視しながらスピン旋回させ、90度（900）に達した瞬間にモーターをガチッと固定停止（HOLD）させる最高峰の走行テクニックです。</p>
+<pre>
+import motor_pair
+import imu
+from hub import port
+import runloop
+import motor
+
+async def main():
+    # 左右の走行用モーターを設定
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    
+    # 1. いま向いている向きを「0度」として基準をリセット
+    imu.reset_yaw(0)
+    await runloop.sleep_ms(100) # リセット処理がハブ内で安定するまで少し待つ
+    
+    # 2. 右にスピン旋回をスタート（ずっと回すモード）
+    motor_pair.move(motor_pair.PAIR_1, steering=100, velocity=200)
+    
+    # 3. ジャイロの角度が「90度（数値として900）」になるまで非同期ループで監視
+    while imu.rotation() < 900:
+        await runloop.sleep_ms(5) # 5ミリ秒ごとに超高速でチェック
+        
+    # 4. 90度になった瞬間にガチッと電子ブレーキをかけて停止
+    motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
+    print("正確な90度旋回が完了しました！")
+
+runloop.run(main())
+</pre>
+
+    <hr style="border: 0; border-top: 1px solid #ecf0f1; margin: 30px 0;">
+    <a href="index.html" class="back-btn">⬅ メニューに戻る</a>
+</div>
+</body>
+</html>
