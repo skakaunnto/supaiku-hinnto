@@ -1,7 +1,25 @@
 <style>
+/* 1. エラーが出る古いURLを使わず、実際のフォントファイルを直接定義して警告を消す */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(https://gstatic.com) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(https://gstatic.com) format('truetype');
+}
+
 /* 全体のフォントなどの基本調整 */
 body {
-    font-family: sans-serif;
+    font-family: 'Open Sans', sans-serif;
     line-height: 1.6;
     background-color: #f8f9fa;
     padding: 20px;
@@ -25,7 +43,7 @@ body {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     color: #333333;
     border: 1px solid #e2e8f0;
-    text-align: center; /* 文字を真ん中寄せにしてスッキリ配置 */
+    text-align: center;
 }
 
 /* カードをクリックできるボタンにするための設定 */
@@ -42,7 +60,7 @@ body {
     background-color: #ffffff;
 }
 
-/* 各項目のテーマカラー（左側のアクセント線） */
+/* 各項目のテーマカラー */
 .color-sensor { border-left: 6px solid #e74c3c; }
 .distance-sensor { border-left: 6px solid #3498db; }
 .force-sensor { border-left: 6px solid #2ecc71; }
@@ -68,6 +86,7 @@ body {
     margin: 0;
 }
 </style>
+
 
 # 📚 LEGO Education SPIKE (App 3) 公式 Python API 辞書
 
