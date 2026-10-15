@@ -1,25 +1,7 @@
 <style>
-/* 1. エラーが出る古いURLを使わず、実際のフォントファイルを直接定義して警告を消す */
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: normal;
-  font-display: swap;
-  src: url(https://gstatic.com) format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: normal;
-  font-display: swap;
-  src: url(https://gstatic.com) format('truetype');
-}
-
-/* 全体のフォントなどの基本調整 */
+/* 全体のフォントなどの基本調整（フォントの外部読み込みを廃止し、システムの標準フォントに任せる） */
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
     background-color: #f8f9fa;
     padding: 20px;
@@ -60,7 +42,7 @@ body {
     background-color: #ffffff;
 }
 
-/* 各項目のテーマカラー */
+/* 各項目のテーマカラー（左側のアクセント線） */
 .color-sensor { border-left: 6px solid #e74c3c; }
 .distance-sensor { border-left: 6px solid #3498db; }
 .force-sensor { border-left: 6px solid #2ecc71; }
