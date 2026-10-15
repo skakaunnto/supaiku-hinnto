@@ -136,7 +136,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- カラーセンサー -->
     <a href="color.html" class="card-link">
-        <div class="main-card color-sensor">
         <div id="color" class="main-card color-sensor">
             <h3>🎨 カラーセンサー (color_sensor)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -145,7 +144,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- 超音波距離センサー -->
     <a href="distance.html" class="card-link">
-        <div class="main-card distance-sensor">
         <div id="distance" class="main-card distance-sensor">
             <h3>🦇 距離センサー (distance_sensor)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -154,7 +152,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- フォースセンサー -->
     <a href="force.html" class="card-link">
-        <div class="main-card force-sensor">
         <div id="force" class="main-card force-sensor">
             <h3>🖲️ フォースセンサー (force_sensor)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -163,7 +160,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- 内蔵ジャイロセンサー -->
     <a href="imu.html" class="card-link">
-        <div class="main-card gyro-sensor">
         <div id="imu" class="main-card gyro-sensor">
             <h3>🧭 ジャイロセンサー (imu)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -172,7 +168,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- 非同期の基本 -->
     <a href="async-basic.html" class="card-link">
-        <div class="main-card async-basic">
         <div id="async-basic" class="main-card async-basic">
             <h3>🟣 非同期の基本 (async / await)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -181,7 +176,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- 同時並行処理 -->
     <a href="async-parallel.html" class="card-link">
-        <div class="main-card async-parallel">
         <div id="async-parallel" class="main-card async-parallel">
             <h3>🟢 同時並行処理 (create_task)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -190,7 +184,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- 無限ループのフリーズ防止 -->
     <a href="async-loop.html" class="card-link">
-        <div class="main-card async-loop">
         <div id="async-loop" class="main-card async-loop">
             <h3>🟠 無限ループとフリーズ防止</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -199,7 +192,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- ライトマトリクス -->
     <a href="light.html" class="card-link">
-        <div class="main-card light-matrix">
         <div id="light" class="main-card light-matrix">
             <h3>💡 ライトマトリクス (5x5画面)</h3>
             <p class="click-hint">詳しく見る ➔</p>
@@ -208,7 +200,6 @@ motor_pair.stop(motor_pair.PAIR_1, stop=motor.HOLD)
 
     <!-- BEEP音 -->
     <a href="sound.html" class="card-link">
-        <div class="main-card beep-sound">
         <div id="sound" class="main-card beep-sound">
             <h3>🎵 BEEP音・スピーカー制御</h3>
             <p class="click-hint">詳しく見る ➔</p>
