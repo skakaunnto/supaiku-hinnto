@@ -70,7 +70,8 @@ body {
 </style>
 
 
-# 📚 LEGO Education SPIKE (App 3) 公式 Python API 辞書
+# <img src="logo.png" width="40" style="vertical-align: middle; margin-right: 10px;"> supaiku-hinnto
+
 
 SPIKE アプリのナレッジベースに準拠した公式のモジュールと関数のリファレンスです。
 
