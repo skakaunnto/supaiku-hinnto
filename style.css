@@ -1,0 +1,21 @@
+/* コードブロック全体の背景を黒にする */
+pre, 
+code, 
+pre code, 
+.highlight pre, 
+.highlight code {
+    background-color: #1e1e1e !important; /* 暗い黒（VS Code風） */
+    color: #ffffff !important;            /* 文字色を白にする */
+    border: none !important;              /* 必要に応じて枠線を消す */
+    padding: 1em !important;              /* 内側の余白 */
+    border-radius: 6px !important;        /* 角を少し丸くする */
+}
+
+/* インラインコード（文中の `code`）の背景も黒くしたい場合 */
+p code, 
+li code {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    padding: 0.2em 0.4em !important;
+    border-radius: 3px !important;
+}
