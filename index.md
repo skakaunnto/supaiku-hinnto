@@ -1,5 +1,3 @@
-<link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico">
-
 <style>
 /* 全体のフォントなどの基本調整（フォントの外部読み込みを廃止し、システムの標準フォントに任せる） */
 body {
