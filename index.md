@@ -223,10 +223,11 @@ import runloop
 async def main():
     # ここにメインのプログラムを書きます
     print("プログラムを開始します")
-    
     # 指定した時間だけプログラムを一時停止する（例: 1000ミリ秒 = 1秒待つ）
     await runloop.sleep_ms(1000)
 
 # メイン関数を実行ループに登録して起動する
 runloop.run(main())
 </pre>
+
+テスト
