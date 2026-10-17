@@ -229,5 +229,3 @@ async def main():
 # メイン関数を実行ループに登録して起動する
 runloop.run(main())
 </pre>
-
-テスト
