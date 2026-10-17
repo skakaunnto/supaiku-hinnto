@@ -72,7 +72,7 @@ body {
 </style>
 
 
-# <img src="logo.png" width="120" style="vertical-align: middle; margin-right: 10px;"> supaiku-hinnto
+# <img src="logo.png" width="150" style="vertical-align: middle; margin-right: 10px;"> supaiku-hinnto
 
 
 SPIKE アプリのナレッジベースに準拠した公式のモジュールと関数のリファレンスです。
