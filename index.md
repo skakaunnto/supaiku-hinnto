@@ -1,3 +1,5 @@
+<link rel="icon" type="image/png" href="/supaiku-hinnto/logo.png">
+
 <style>
 /* 全体のフォントなどの基本調整（フォントの外部読み込みを廃止し、システムの標準フォントに任せる） */
 body {
